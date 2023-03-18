@@ -1,9 +1,8 @@
 def mlp(out, W2, W1, x, output_dim, hidden_dim, input_dim):
     x1 = array(hidden_dim)
     fc(x1, W1, x, hidden_dim, input_dim)
-    x2 = array(output_dim)
+    x2 = array(hidden_dim)
     ReLU(x2, x1, hidden_dim)
-    out = array(output_dim)
     fc(out, W2, x2,output_dim, hidden_dim)
 
 def fc(out, W, x, M, N):
@@ -24,4 +23,5 @@ def ReLU(out, x, N):
             out[i] = val
     
     return out
+
 

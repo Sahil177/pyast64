@@ -105,11 +105,13 @@ print("version 1")
 program = convert_for_state(program[:-3])
 # print(*program, sep="\n")
 x = [6, 3, 5]
-W = [[12, 13, 5], [4, 5, 5], [2, 2, 2]]
+W = [[12, 13, 5], [4, 5, 5], [2, 2, 2], [5,6,3]]
 input, os, oe = fc_process(W, x, inp_start)
 state = execute(program, stack_len, input)
 # out = process_out(state[os:oe])
 out = state[os:oe]
+print('x', x)
+print('w', W)
 print(out)
 acc = test(100, 10 ,10, inp_start, program, stack_len)
 print(acc)

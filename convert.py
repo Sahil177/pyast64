@@ -157,8 +157,9 @@ def convert(total):
             suff, args = com_type(new_args)
             converted.append(["add" + suff, args])
         elif op_code == "shlq":
-            suff, args = com_type([2 ** int(new_args[0]), new_args[1]])
-            converted.append(["mul" + suff, args])
+            # suff, args = com_type([2**int(new_args[0]), new_args[1]])
+            # converted.append(["mul" + suff, args])
+            pass
         elif op_code == "subq":
             suff, args = com_type(new_args)
             converted.append(["sub" + suff, args])
@@ -288,15 +289,6 @@ def execute(program, stack_len, inputs=[]):
     # state = [0] * (registers + 8 * stack_len) + inputs
     state = [0] * (registers + stack_len) + inputs
 
-    # state[registers + 8 * stack_len + 8] = registers + 8 * stack_len + 16
-    # print(state[56 : 56 + 88])
-    # print(len([0] * (registers + 8 * stack_len)))
-    # print(state[103:])
-    # print(state[144])
-    # print(state[160])
-    # print(state[176])
-    # print("INP START")
-    # print(registers + 8 * stack_len)
     for i in range(len(program)):
         op_code, args = program[i]
         state.append(op_code)
@@ -307,9 +299,11 @@ def execute(program, stack_len, inputs=[]):
 
     start = registers + stack_len + len(inputs)
     end = start + 7 * (len(program) - 2)
-    # end = start + 18*7
+    end = start + 19*7
+    # end = start + 36*7
+    end = start + 66*7
     # end = start + 74*7
-    print('end cmd', state[end:end+7])
+    # print('end cmd', state[end:end+7])
     
 
     # print("init", state[0])
@@ -345,7 +339,7 @@ def execute(program, stack_len, inputs=[]):
         # )
         i += 1
 
-    print(i)
+    # print(i)
     # print(state[state[reg["rip"]]])
     # print(state[state[reg["rbp"]] + 16])
     return state

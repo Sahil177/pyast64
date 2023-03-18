@@ -1,0 +1,17 @@
+def mlp(out, W1, x, hidden_dim, input_dim):
+    x1 = array(hidden_dim)
+    fc(x1, W1, x, hidden_dim, input_dim)    
+    copy_to_out(x1, out, hidden_dim)
+
+
+def fc(out, W, x, M, N):
+
+    for i in range(M):
+        sum = 0
+        for j in range(N):
+            sum += x[j]*W[i*N+j]
+        out[i] = sum
+
+def copy_to_out(source, destination, N):
+    for i in range(N):
+        destination[i] = source[i]
