@@ -1,0 +1,7 @@
+def main():
+    a = array(10)
+    for i in range(10):
+        if a >= 0:
+            a[i] = -1
+        else:
+            a[i] = 1

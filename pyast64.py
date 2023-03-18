@@ -8,7 +8,7 @@ Released under a permissive MIT license (see LICENSE.txt).
 import argparse
 import ast
 import sys
-
+import re
 
 class Assembler:
     """The Assembler takes care of outputting instructions, labels, etc.,
@@ -21,13 +21,16 @@ class Assembler:
         self.peephole = peephole
         # Current batch of instructions, flushed on label and end of function
         self.batch = []
+        self.total = []
 
     def flush(self):
         if self.peephole:
             self.optimize_pushes_pops()
-        for opcode, args in self.batch:
-            print('\t{}\t{}'.format(opcode, ', '.join(str(a) for a in args)),
+        for op_code, args in self.batch:
+            print('\t{}\t{}'.format(op_code, ', '.join(str(a) for a in args)),
                   file=self.output_file)
+        
+        self.total += self.batch
         self.batch = []
 
     def optimize_pushes_pops(self):
@@ -62,30 +65,30 @@ class Assembler:
             optimized[mid - num:mid + num] = moves
 
         # This loop actually finds the sequences
-        for opcode, args in self.batch:
+        for op_code, args in self.batch:
             if state == 'default':
-                if opcode == 'pushq':
+                if op_code == 'pushq':
                     state = 'push'
                     pushes += 1
                 else:
                     pushes = 0
                     pops = 0
-                optimized.append((opcode, args))
+                optimized.append((op_code, args))
             elif state == 'push':
-                if opcode == 'pushq':
+                if op_code == 'pushq':
                     pushes += 1
-                elif opcode == 'popq':
+                elif op_code == 'popq':
                     state = 'pop'
                     pops += 1
                 else:
                     state = 'default'
                     pushes = 0
                     pops = 0
-                optimized.append((opcode, args))
+                optimized.append((op_code, args))
             elif state == 'pop':
-                if opcode == 'popq':
+                if op_code == 'popq':
                     pops += 1
-                elif opcode == 'pushq':
+                elif op_code == 'pushq':
                     combine()
                     state = 'push'
                     pushes = 1
@@ -95,19 +98,20 @@ class Assembler:
                     state = 'default'
                     pushes = 0
                     pops = 0
-                optimized.append((opcode, args))
+                optimized.append((op_code, args))
             else:
                 assert False, 'bad state: {}'.format(state)
         if state == 'pop':
             combine()
         self.batch = optimized
 
-    def instr(self, opcode, *args):
-        self.batch.append((opcode, args))
+    def instr(self, op_code, *args):
+        self.batch.append((op_code, args))
 
     def label(self, name):
         self.flush()
         print('{}:'.format(name), file=self.output_file)
+        self.total.append([name, []])
 
     def directive(self, line):
         self.flush()
@@ -129,10 +133,12 @@ class LocalsVisitor(ast.NodeVisitor):
         self.function_calls = []
 
     def add(self, name):
+        # print("visit local")        
         if name not in self.local_names and name not in self.global_names:
             self.local_names.append(name)
 
     def visit_Global(self, node):
+        # print("visit global")
         self.global_names.extend(node.names)
 
     def visit_Assign(self, node):
@@ -162,17 +168,22 @@ class Compiler:
             assembler = Assembler(peephole=peephole)
         self.asm = assembler
         self.func = None
+        self.i = 8
 
     def compile(self, node):
         self.header()
         self.visit(node)
-        self.footer()
+        # self.footer()
+
 
     def visit(self, node):
         # We could have subclassed ast.NodeVisitor, but it's better to fail
         # hard on AST nodes we don't support
         name = node.__class__.__name__
+        # print(name)
+        # print(f'NAME: {name}')
         visit_func = getattr(self, 'visit_' + name, None)
+        # print(f'VISIT FUNC: {visit_func}')
         assert visit_func is not None, '{} not supported - node {}'.format(
                 name, ast.dump(node))
         visit_func(node)
@@ -210,10 +221,16 @@ class Compiler:
         self.func = node.name
         self.label_num = 1
         self.locals = {a.arg: i for i, a in enumerate(node.args.args)}
+        # print('locals')
+        # print(self.locals)
 
         # Find names of additional locals assigned in this function
         locals_visitor = LocalsVisitor()
         locals_visitor.visit(node)
+        # print("DONE LOCALS")
+        # print(locals_visitor.local_names)
+        # print(locals_visitor.global_names)
+        # print(locals_visitor.function_calls)
         for name in locals_visitor.local_names:
             if name not in self.locals:
                 self.locals[name] = len(self.locals) + 1
@@ -224,7 +241,7 @@ class Compiler:
 
         # Function label and header
         if node.name == 'main':
-            self.asm.directive('.globl _main')
+            self.asm.directive('.global _main')
             self.asm.label('_main')
         else:
             self.asm.label(node.name)
@@ -233,6 +250,7 @@ class Compiler:
 
         # Now compile all the statements in the function body
         for statement in node.body:
+            # print(node.body)
             self.visit(statement)
 
         if not isinstance(node.body[-1], ast.Return):
@@ -263,8 +281,8 @@ class Compiler:
             self.asm.instr('addq', '%rbx', '%rsp')
         self.asm.instr('popq', '%rbp')
         if num_extra_locals > 0:
-            self.asm.instr('leaq', '{}(%rsp),%rsp'.format(
-                    num_extra_locals * 8))
+            self.asm.instr('leaq', '{}(%rsp)'.format(
+                    num_extra_locals * 8), '%rsp')
         self.asm.instr('ret')
 
     def compile_exit(self, return_code):
@@ -289,6 +307,7 @@ class Compiler:
     def visit_Num(self, node):
         self.asm.instr('pushq', '${}'.format(node.n))
 
+
     def local_offset(self, name):
         index = self.locals[name]
         return (len(self.locals) - index) * 8 + 8
@@ -302,8 +321,10 @@ class Compiler:
         # Only supports assignment of (a single) local variable
         assert len(node.targets) == 1, \
             'can only assign one variable at a time'
+        # print(node.value)
         self.visit(node.value)
         target = node.targets[0]
+        # print(target)
         if isinstance(target, ast.Subscript):
             # array[offset] = value
             self.visit(target.slice.value)

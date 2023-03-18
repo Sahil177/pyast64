@@ -1,0 +1,8 @@
+def sq_main(out, arr, N):
+    square(out, arr, N)
+
+def square(out, arr, N):
+    for i in range(N):
+        val = arr[i]
+        val = val*val
+        out[i] = val 

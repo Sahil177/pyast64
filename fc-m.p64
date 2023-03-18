@@ -1,0 +1,12 @@
+
+def fc(out, W, x, M, N):
+
+    for i in range(M):
+        sum = 0
+        for j in range(N):
+            sum += x[j]*W[i*N+j]
+        out[i] = sum
+
+
+
+    

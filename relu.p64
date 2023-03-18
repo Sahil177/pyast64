@@ -1,0 +1,8 @@
+def ReLU(out, x, N):
+    for i in range(N):
+        val = x[i]
+        if val < 0:
+            out[i] = 0
+        else:
+            out[i] = val
+        
