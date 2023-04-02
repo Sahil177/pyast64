@@ -1,0 +1,6 @@
+def skillcomb(alphas, Ws):
+    out1 = array(6)
+    out2 = array(6)
+    out2 = array(6)
+    input = array(7)
+    

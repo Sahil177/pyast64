@@ -5,11 +5,11 @@ def mlp(out, W2, W1, x, output_dim, hidden_dim, input_dim):
     ReLU(x2, x1, hidden_dim)
     fc(out, W2, x2,output_dim, hidden_dim)
 
-def fc(out, W, x, M, N):
+def fc(out, W, x, M, N): 
 
-    for i in range(M):
+    for i in range(M): 
         sum = 0
-        for j in range(N):
+        for j in range(N): 
             sum += x[j]*W[i*N+j]
         out[i] = sum
 
@@ -22,6 +22,6 @@ def ReLU(out, x, N):
         else:
             out[i] = val
     
-    return out
+
 
 

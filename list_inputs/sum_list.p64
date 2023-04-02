@@ -1,0 +1,13 @@
+def f(inputs):
+    sum_list(inputs)
+
+def sum_list(inputs):
+    N_p = inputs[0]
+    N = N_p[0]
+    arr = inputs[1]
+    out = inputs[2]
+    sum = 0
+    for i in range(N):
+        sum += arr[i]
+    out[0] = sum
+    

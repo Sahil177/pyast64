@@ -1,0 +1,15 @@
+def f(inputs):
+    ReLU(inputs)
+
+def ReLU(inputs):
+    N_p = inputs[0]
+    N = N_p[0]
+    x = inputs[1]
+    out = inputs[2]
+    for i in range(N):
+        val = x[i]
+        if val < 0:
+            out[i] = 0
+        else:
+            out[i] = val
+        

@@ -1,3 +1,5 @@
+import sys 
+sys.path.append('..')
 
 from convert import *
 
@@ -41,7 +43,7 @@ node = ast.parse(source, filename = file)
 compiler = Compiler(peephole=True)
 compiler.compile(node)
 program, stack_len = convert(compiler.asm.total)
-stack_len = 100
+stack_len = 2000
 print("s", stack_len)
 # inp_start = registers + 8 * stack_len
 inp_start = registers + stack_len
@@ -53,16 +55,16 @@ program = convert_for_state(program)
 for i in range(len(program)):
     print(i, program[i])
 # print(*program, sep="\n")
-x = np.random.randint(low=-10, high=10,size=5)
-W1 = np.random.randint(low=-10, high=10, size=(7,5))
-W2 = np.random.randint(low=-10, high=10, size =(3,7))
+x = np.random.randint(low=-10, high=10,size=4)
+W1 = np.random.randint(low=-10, high=10, size=(5,4))
+W2 = np.random.randint(low=-10, high=10, size =(10,5))
 print(x)
 print(W1)
 print(W2)
 x1 = np.matmul(W1,x)
 x1 = np.maximum(x1,0)
 x1 = np.matmul(W2, x1)
-print(x1)
+print(list(x1))
 
 input, os, oe = mlp_process(x,W1, W2, inp_start)
 state = execute(program, stack_len, input)

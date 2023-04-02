@@ -437,7 +437,7 @@ class Compiler:
             self.asm.instr('call', node.func.id)
             if node.args:
                 # Caller cleans up the arguments from the stack
-                # self.asm.instr('addq', '${}'.format(8 * len(node.args)), '%rsp')
+                # self.asm.instr('addq', '${}'.format(8 * len(node.args)), '%rsp') # KEY CHANGE
                 self.asm.instr('addq', '${}'.format(len(node.args)), '%rsp')
             # Return value is in rax, so push it on the stack now
             self.asm.instr('pushq', '%rax')

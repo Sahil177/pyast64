@@ -62,11 +62,6 @@ state = execute(program, stack_len, input)
 out = state[os:oe]
 print(out)
 out2 = state[state[out_add]: state[out_add] + out_dim]
-print(out2)
 
-
-print(state[inp_start-30:inp_start+6])
-print(inp_start-9)
-print(state[out_add])
 # acc = test(100, 10 ,10, inp_start, program, stack_len)
 # print(acc)

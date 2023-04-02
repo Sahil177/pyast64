@@ -30,19 +30,19 @@ reg = {
 registers = len(reg) + 2
 stack_len = 8
 
-cmd = {
-    "mov": 0,
-    "add": 1,
-    "mul": 2,
-    "cmp": 3,
-    "jz": 4,
-    "jnl": 5,
-    "inc": 6,
-    "sub": 7,
-    "leaq": 8,
-    "jmp": 9,
-    "ret": 10,
-}
+# cmd = {
+#     "mov": 0,
+#     "add": 1,
+#     "mul": 2,
+#     "cmp": 3,
+#     "jz": 4,
+#     "jnl": 5,
+#     "inc": 6,
+#     "sub": 7,
+#     "leaq": 8,
+#     "jmp": 9,
+#     "ret": 10,
+# }
 
 cmd = {
     "mov": 0,
@@ -299,10 +299,7 @@ def execute(program, stack_len, inputs=[]):
 
     start = registers + stack_len + len(inputs)
     end = start + 7 * (len(program) - 2)
-    end = start + 19*7
-    # end = start + 36*7
-    end = start + 66*7
-    # end = start + 74*7
+    end = start + 15*7
     # print('end cmd', state[end:end+7])
     
 
@@ -323,8 +320,8 @@ def execute(program, stack_len, inputs=[]):
         # if hit_break:
         #     print(state[state[reg["rip"]] : state[reg["rip"]] + 7])
 
-        # print(state[reg['rip']])
-        # print(state[state[reg['rbp']] + 8])
+        # print(state[reg['rip']]/7)
+        # print(i, state[state[reg['rbp']] + 5])
         # print(state[reg["rip"]]/7-7, state[reg['nlf']])
         # print(state[reg["rax"]])
         # print(
@@ -337,6 +334,7 @@ def execute(program, stack_len, inputs=[]):
         #     "rdx",
         #     state[reg["rdx"]],
         # )
+        # print(state[state[reg['rip']]: state[reg['rip']]+ 7 ], state[state[reg['rbp']] + 5])
         i += 1
 
     # print(i)
@@ -526,6 +524,20 @@ def comp_addr(op_code, addr1, addr2, addr3, addr4, addr5, addr6):
         # print(op_code)
         return None
 
+def process(inputs, inp_start):
+    out = [inp_start + 1, inp_start + len(inputs) + 1]
+
+    for i in range(len(inputs)-1):
+        out.append(out[-1] + len(inputs[i]))
+
+    out_start = out[-1]
+    
+    for inp in inputs:
+        out += inp
+
+    out_end = inp_start + len(out)
+
+    return out, out_start, out_end
 
 
 if __name__ == "__main__":

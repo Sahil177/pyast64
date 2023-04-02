@@ -1,0 +1,65 @@
+def f(inputs):
+    mlp(inputs)
+
+def mlp(inputs):
+    input_dim_p = inputs[0]
+    input_dim = input_dim_p[0]
+    hidden_dim_p = inputs[1]
+    hidden_dim = hidden_dim_p[0]
+    output_dim_p = inputs[2]
+    output_dim = output_dim_p[0]
+    x = inputs[3]
+    W1 = inputs[4]
+    W2 = inputs[5]
+    out = inputs[6]
+
+    x1 = array(hidden_dim)
+    inputs[2] = x
+    inputs[3] = W1
+    inputs[4] = x1
+
+    fc(inputs)
+
+    x2 = array(hidden_dim)
+    inputs[0] = hidden_dim_p
+    inputs[1] = x1
+    inputs[2] = x2
+
+    ReLU(inputs)
+
+    inputs[1] = output_dim_p
+    inputs[2] = x2
+    inputs[3] = W2
+    inputs[4] = out
+
+    fc(inputs)
+
+def fc(inputs):
+    input_dim_p = inputs[0]
+    input_dim = input_dim_p[0]
+    output_dim_p = inputs[1]
+    output_dim = output_dim_p[0]
+    x = inputs[2]
+    W = inputs[3]
+    out = inputs[4]
+    for i in range(output_dim):
+        sum = 0
+        for j in range(input_dim):
+            sum += x[j]*W[i*input_dim+j]
+        out[i] = sum
+
+def ReLU(inputs):
+    N_p = inputs[0]
+    N = N_p[0]
+    x = inputs[1]
+    out = inputs[2]
+    for i in range(N):
+        val = x[i]
+        if val < 0:
+            out[i] = 0
+        else:
+            out[i] = val
+    
+
+
+
