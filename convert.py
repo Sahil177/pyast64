@@ -79,13 +79,15 @@ cmd = {
     "jmp3": 31,
     "cjmp": 32,
     "inc": 33,
-    "leaq": 34
+    "leaq": 34,
+    "cjmp2": 35
 }
 
 cmd_rev = {cmd[i]: i for i in cmd}
 
 
 def com_type(args):
+    # print(args)
     if type(args[0]) != list and type(args[1]) != list:
         arg = [args[0], args[1], "dum", "dum", 0, 0]
         return "", arg
@@ -182,6 +184,10 @@ def convert(total):
         elif op_code == "jnl":
             converted.append(
                 ["cjmp", [new_args[0], "rip", "nlf", "ofst", 0, 0]]
+            )
+        elif op_code == "jne":
+            converted.append(
+                ["cjmp2", ["rip", new_args[0], "ef", "ofst", 0, 0]]
             )
         elif op_code == 'call':
             stack_len += 1
@@ -346,7 +352,22 @@ def execute(program, stack_len, inputs=[]):
 def execute_command(state):
     op_code = state[state[reg["rip"]]]
     args = state[state[reg["rip"]] + 1 : state[reg["rip"]] + 7]
-    # print(op_code, args)
+    # print(state[reg["rip"]], op_code, args)
+
+    # if args[0] == 2344:
+    #         print("hi")
+    #         print(state[2018:2030])
+
+    # if args[0] == 4226:
+    #         print("hi")
+    #         print(state[2018:2032])
+
+    if args[0] == 4226:
+            print("hi")
+            print(state[2018:2032])
+
+
+    # print(op_code)
 
     for i in range(len(args)):
         if args[i] > registers:
@@ -358,6 +379,7 @@ def execute_command(state):
     # addr6 = state[addr2] + 8 * state[off2_add]
 
     # print(addr2, off2_add)
+    # print(state[6521])
 
     addr5 = state[addr1] + state[off1_add]
     addr6 = state[addr2] + state[off2_add]
@@ -365,7 +387,7 @@ def execute_command(state):
 
     addrs = [addr1, addr2, addr3, addr4, addr5, addr6]
     # print(addrs)
-
+    # print(state[reg["rip"]], op_code, args, addrs)
     for i in range(len(addrs)):
         if addrs[i] > len(state) or addrs[i] < 0 or not float(addrs[i]).is_integer():
             addrs[i] = 0
@@ -464,11 +486,17 @@ def comp_result(op_code, val1, val2, val3, val4, val5, val6):
     elif op_code == "jmp1" or op_code == "jmp3":
         return val5 + val3
     elif op_code == "cjmp":
-        # print(val1, val2, val3)
+        # print(val1, val2, val3, val4)
         if val3:
             return val1 + val4
         else:
             return val2  # + val4
+    elif op_code == "cjmp2":
+        # print(val1, val2, val3, val4)
+        if val3:
+            return val1 #+ val4
+        else:
+            return val2  + val4
     else:
         return None
 
@@ -518,7 +546,7 @@ def comp_addr(op_code, addr1, addr2, addr3, addr4, addr5, addr6):
         return reg["gf"]
     elif op_code in set5:
         return reg["nlf"]
-    elif op_code == "cjmp":
+    elif op_code == "cjmp" or op_code == "cjmp2":
         return reg["rip"]
     else:
         # print(op_code)
@@ -538,7 +566,6 @@ def process(inputs, inp_start):
     out_end = inp_start + len(out)
 
     return out, out_start, out_end
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -3,34 +3,31 @@ def f(inputs):
 
 def mlp(inputs):
     input_dim_p = inputs[0]
-    input_dim = input_dim_p[0]
     hidden_dim_p = inputs[1]
-    hidden_dim = hidden_dim_p[0]
     output_dim_p = inputs[2]
-    output_dim = output_dim_p[0]
     x = inputs[3]
     W1 = inputs[4]
     W2 = inputs[5]
-    out = inputs[6]
+    out1 = inputs[6]
+    out2 = inputs[7]
+    out3 = inputs[8]
 
-    x1 = array(hidden_dim)
     inputs[2] = x
     inputs[3] = W1
-    inputs[4] = x1
+    inputs[4] = out1
 
     fc(inputs)
 
-    x2 = array(hidden_dim)
     inputs[0] = hidden_dim_p
-    inputs[1] = x1
-    inputs[2] = x2
+    inputs[1] = out1
+    inputs[2] = out2
 
     ReLU(inputs)
 
     inputs[1] = output_dim_p
-    inputs[2] = x2
+    inputs[2] = out2
     inputs[3] = W2
-    inputs[4] = out
+    inputs[4] = out3
 
     fc(inputs)
 

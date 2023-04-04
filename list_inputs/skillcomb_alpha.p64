@@ -1,0 +1,89 @@
+def f(inputs):
+    skill_comb(inputs)
+
+def skill_comb(inputs):
+    num_inputs_p = inputs[0]
+    input_dim_p = inputs[1]
+    hidden_dim_p = inputs[2]
+    output_dim_p = inputs[3]
+    x = inputs[4]
+    W1 = inputs[5]
+    W2 = inputs[6]
+    out1 = inputs[7]
+    out2 = inputs[8]
+    out3 = inputs[9]
+    timesteps_p = inputs[10]
+    skills_p = inputs[11]
+
+    num_inputs = num_inputs_p[0]
+
+    inputs_copy = array(num_inputs)
+
+    for i in range(num_inputs):
+        val = inputs[i+1]
+        inputs_copy[i] = val
+
+    timesteps = timesteps_p[0]
+    skills = skills_p[0]
+    for t in range(timesteps):
+        Ws = inputs[num_inputs + 3 + t]
+        alpha = inputs[num_inputs + 3 + timesteps + t]
+
+        W_func(inputs, num_inputs, Ws)
+
+        for s in range(skills):
+            flag = alpha[s]
+            if flag == 1:
+                if s == 0:
+                    fc(inputs)
+                else:
+                    ReLU(inputs)
+
+        for i in range(num_inputs):
+            val = inputs_copy[i]
+            inputs[i+1] = val
+        
+
+def W_func(inputs, num_inputs, Wsx):
+    outputs = array(num_inputs)
+
+
+    for i in range(num_inputs):
+        sum = 0
+        for j in range(num_inputs):
+            sum += inputs[j+1]*Wsx[i*num_inputs + j]
+        outputs[i] = sum
+
+    for i in range(num_inputs):
+        inputs[i+1] = outputs[i] 
+
+
+def fc(inputs):
+    input_dim_p = inputs[1]
+    input_dim = input_dim_p[0]
+    output_dim_p = inputs[2]
+    output_dim = output_dim_p[0]
+    x = inputs[3]
+    W = inputs[4]
+    out = inputs[5]
+    for i in range(output_dim):
+        sum = 0
+        for j in range(input_dim):
+            sum += x[j]*W[i*input_dim+j]
+        out[i] = sum
+
+def ReLU(inputs):
+    N_p = inputs[1]
+    N = N_p[0]
+    x = inputs[2]
+    out = inputs[3]
+    for i in range(N):
+        val = x[i]
+        if val < 0:
+            out[i] = 0
+        else:
+            out[i] = val
+
+    
+
+

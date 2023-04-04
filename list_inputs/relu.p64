@@ -8,7 +8,7 @@ def ReLU(inputs):
     out = inputs[2]
     for i in range(N):
         val = x[i]
-        if val < 0:
+        if val == 100:
             out[i] = 0
         else:
             out[i] = val
