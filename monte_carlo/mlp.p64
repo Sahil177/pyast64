@@ -1,0 +1,147 @@
+def f(inputs):
+    test(inputs)
+
+def test(inputs):
+    num_points_p = inputs[0]
+    test_inps = inputs[1]
+    test_labels = inputs[2]
+    input_dim_p = inputs[3]
+    hidden_dim_p = inputs[4]
+    output_dim_p = inputs[5]
+    W1 = inputs[6]
+    b1 = inputs[7]
+    W2 = inputs[8]
+    b2 = inputs[9]
+    W3 = inputs[10]
+    b3 = inputs[11]
+    out1 = inputs[12]
+
+    output_dim = output_dim_p[0]
+    batch_dim = num_points_p[0]
+    out1p = array(output_dim*batch_dim)
+    mlp_inp = array(12)
+    mlp_inp[0] = num_points_p
+    mlp_inp[1] = input_dim_p
+    mlp_inp[2] = hidden_dim_p
+    mlp_inp[3] = output_dim_p
+    mlp_inp[4] = test_inps
+    mlp_inp[5] = W1
+    mlp_inp[6] = b1
+    mlp_inp[7] = W2
+    mlp_inp[8] = b2
+    mlp_inp[9] = W3
+    mlp_inp[10] = b3
+    mlp_inp[11] = out1p
+
+    mlp(mlp_inp)
+
+    correct = 0
+    for i in range(batch_dim):
+        pred_out = out1p[i]
+        label = test_labels[i]
+        if pred_out < 0:
+            if label == 0:
+                correct += 1
+        else:
+            if label == 1:
+                correct +=1
+    
+    out1[0] = correct
+
+def mlp(inputs):
+    batch_dim_p = inputs[0]
+    input_dim_p = inputs[1]
+    hidden_dim_p = inputs[2]
+    output_dim_p = inputs[3]
+    x = inputs[4]
+    W1 = inputs[5]
+    b1 = inputs[6]
+    W2 = inputs[7]
+    b2 = inputs[8]
+    W3 = inputs[9]
+    b3 = inputs[10]
+    hidden_dim = hidden_dim_p[0]
+    batch_dim = batch_dim_p[0]
+    out1 = array(hidden_dim*batch_dim)
+    out2 = array(hidden_dim*batch_dim)
+    out3 = array(hidden_dim*batch_dim)
+    out4 = array(hidden_dim*batch_dim)
+    out5 = inputs[11]
+
+    inputs[3] = x
+    inputs[4] = W1
+    inputs[5] = b1
+    inputs[6] = out1
+
+    fc(inputs)
+
+    inputs[0] = batch_dim_p
+    inputs[1] = hidden_dim_p
+    inputs[2] = out1
+    inputs[3] = out2
+
+    ReLU(inputs)
+
+    inputs[0] = batch_dim_p
+    inputs[1] = hidden_dim_p
+    inputs[2] = hidden_dim_p
+    inputs[3] = out2
+    inputs[4] = W2
+    inputs[5] = b2
+    inputs[6] = out3
+
+    fc(inputs)
+
+    inputs[0] = batch_dim_p
+    inputs[1] = hidden_dim_p
+    inputs[2] = out3
+    inputs[3] = out4
+
+    ReLU(inputs)
+
+    inputs[0] = batch_dim_p
+    inputs[1] = hidden_dim_p
+    inputs[2] = output_dim_p
+    inputs[3] = out4
+    inputs[4] = W3
+    inputs[5] = b3
+    inputs[6] = out5
+
+    fc(inputs)
+
+def fc(inputs):
+    batch_dim_p = inputs[0]
+    batch_dim = batch_dim_p[0]
+    input_dim_p = inputs[1]
+    input_dim = input_dim_p[0]
+    output_dim_p = inputs[2]
+    output_dim = output_dim_p[0]
+    xs = inputs[3]
+    W = inputs[4]
+    b = inputs[5]
+    out = inputs[6]
+
+    for k in range(batch_dim):
+        for i in range(output_dim):
+            sum = 0
+            for j in range(input_dim):
+                sum += xs[k*input_dim+j]*W[i*input_dim+j]
+            sum += b[i]
+            out[k*output_dim + i] = sum
+
+def ReLU(inputs):
+    batch_dim_p = inputs[0]
+    N_p = inputs[1]
+    N = N_p[0]*batch_dim_p[0]
+    x = inputs[2]
+    out = inputs[3]
+    for i in range(N):
+        val = x[i]
+        if val < 0:
+            out[i] = 0
+        else:
+            out[i] = val
+    
+
+
+

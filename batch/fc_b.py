@@ -1,10 +1,11 @@
 import sys
+import numpy as np
 
 sys.path.append("..")
 
 from convert import *
 
-file = "fc-m.p64"
+file = "fc_b.p64"
 
 
 def fc_process(W, x, inp_start):
@@ -92,19 +93,36 @@ print("version 1")
 # print(*program, sep="\n")
 program = convert_for_state(program)
 print(*program, sep="\n")
-x = [6, 3, 5]
+num_points = 100
+x = [[6, 3, 5], [4, 3, 6]]
+x = np.random.random((num_points, 3))
+# x_flat = [item for sublist in x for item in sublist]
+x_flat = list(x.flatten())
 W = [[12, 13, 5], [4, 5, 5], [2, 2, 2], [5, 6, 3]]
+b = [1, 2, 3, 4]
 W_flat = [item for sublist in W for item in sublist]
-inputs = [[len(x)], [len(W)], x, W_flat, [0] * len(W)]
+inputs = [
+    [num_points],
+    [len(x[0])],
+    [len(W)],
+    x_flat,
+    W_flat,
+    b,
+    [0] * len(W) * num_points,
+]
 # input, os, oe = fc_process(W, x, inp_start)
 input, os, oe = process(inputs, inp_start)
 print(input)
 state = execute(program, stack_len, input)
 # out = process_out(state[os:oe])
 out = state[os:oe]
-print("x", x)
+# print("x", x_flat)
 print("w", W)
-print(out)
-print(np.matmul(W, x))
-acc = test(100, 10, 10, inp_start, program, stack_len)
-print(acc)
+# print(out)
+res = []
+for i in range(num_points):
+    res += list(np.matmul(W, x[i]) + np.array(b))
+
+print(sum(np.array(res) - np.array(out)))
+# acc = test(100, 10, 10, inp_start, program, stack_len)
+# print(acc)

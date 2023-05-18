@@ -24,7 +24,7 @@ reg = {
     "e": 14,
     "ofst": 15,
     "dum": 16,
-    'r1' : 17
+    "r1": 17,
 }
 
 registers = len(reg) + 2
@@ -80,14 +80,14 @@ cmd = {
     "cjmp": 32,
     "inc": 33,
     "leaq": 34,
-    "cjmp2": 35
+    "cjmp2": 35,
 }
 
 cmd_rev = {cmd[i]: i for i in cmd}
 
 
 def com_type(args):
-    # print(args)
+    print(args)
     if type(args[0]) != list and type(args[1]) != list:
         arg = [args[0], args[1], "dum", "dum", 0, 0]
         return "", arg
@@ -189,25 +189,25 @@ def convert(total):
             converted.append(
                 ["cjmp2", ["rip", new_args[0], "ef", "ofst", 0, 0]]
             )
-        elif op_code == 'call':
+        elif op_code == "call":
             stack_len += 1
             max_stack_len = max(max_stack_len, stack_len)
             converted.append(["sub", [1, "rsp", "dum", "dum", 0, 0]])
-            suff, args = com_type(['rip', ["rsp", 0]])
+            suff, args = com_type(["rip", ["rsp", 0]])
             converted.append(["mov" + suff, args])
             suff, args = com_type([new_args[0], "rip"])
             args[2] = "ofst"
             converted.append(["jmp" + suff, args])
-        elif op_code == 'ret':
+        elif op_code == "ret":
             stack_len -= 1
-            suff, args = com_type([["rsp", 0], 'r1'])
+            suff, args = com_type([["rsp", 0], "r1"])
             converted.append(["mov" + suff, args])
             converted.append(["add", [1, "rsp", "dum", "dum", 0, 0]])
-            suff, args = com_type([7, 'r1'])
-            converted.append(["add" + suff, args])            
-            suff, args = com_type(['r1', 'rip'])
+            suff, args = com_type([7, "r1"])
+            converted.append(["add" + suff, args])
+            suff, args = com_type(["r1", "rip"])
             converted.append(["mov" + suff, args])
-        elif op_code == 'leaq':
+        elif op_code == "leaq":
             suff, args = com_type(new_args)
             args[0] = args[4]
             args[4] = 0
@@ -305,9 +305,8 @@ def execute(program, stack_len, inputs=[]):
 
     start = registers + stack_len + len(inputs)
     end = start + 7 * (len(program) - 2)
-    end = start + 15*7
+    end = start + 15 * 7
     # print('end cmd', state[end:end+7])
-    
 
     # print("init", state[0])
     state[reg["rip"]] = start
@@ -320,6 +319,8 @@ def execute(program, stack_len, inputs=[]):
 
     i = 0
     while state[reg["rip"]] != end:
+        # print(state[reg["rip"]])
+        # print(state[5033:5034])
         execute_command(state)
         # if state[reg["rip"]] == start + 405:
         #     hit_break = True
@@ -362,10 +363,9 @@ def execute_command(state):
     #         print("hi")
     #         print(state[2018:2032])
 
-    if args[0] == 4226:
-            print("hi")
-            print(state[2018:2032])
-
+    # if args[0] == 4226:
+    #         print("hi")
+    #         print(state[2018:2032])
 
     # print(op_code)
 
@@ -381,15 +381,18 @@ def execute_command(state):
     # print(addr2, off2_add)
     # print(state[6521])
 
+    # print(state[addr1], state[off1_add])
     addr5 = state[addr1] + state[off1_add]
     addr6 = state[addr2] + state[off2_add]
-
 
     addrs = [addr1, addr2, addr3, addr4, addr5, addr6]
     # print(addrs)
     # print(state[reg["rip"]], op_code, args, addrs)
     for i in range(len(addrs)):
-        if addrs[i] > len(state) or addrs[i] < 0 or not float(addrs[i]).is_integer():
+        addrs[i] = int(addrs[i])
+        # addrs[i] = addrs[i] % len(state)
+        if addrs[i] > len(state) or addrs[i] < 0:
+            # print("HI")
             addrs[i] = 0
 
     addr1, addr2, addr3, addr4, addr5, addr6 = addrs
@@ -494,9 +497,9 @@ def comp_result(op_code, val1, val2, val3, val4, val5, val6):
     elif op_code == "cjmp2":
         # print(val1, val2, val3, val4)
         if val3:
-            return val1 #+ val4
+            return val1  # + val4
         else:
-            return val2  + val4
+            return val2 + val4
     else:
         return None
 
@@ -552,20 +555,22 @@ def comp_addr(op_code, addr1, addr2, addr3, addr4, addr5, addr6):
         # print(op_code)
         return None
 
+
 def process(inputs, inp_start):
     out = [inp_start + 1, inp_start + len(inputs) + 1]
 
-    for i in range(len(inputs)-1):
+    for i in range(len(inputs) - 1):
         out.append(out[-1] + len(inputs[i]))
 
     out_start = out[-1]
-    
+
     for inp in inputs:
         out += inp
 
     out_end = inp_start + len(out)
 
     return out, out_start, out_end
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

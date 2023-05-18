@@ -1,0 +1,24 @@
+def f(inputs):
+    dfs(inputs)
+
+def dfs(inputs):
+    max_depth_p = inputs[0]
+    cur_depth_p = inputs[1]
+    path = inputs[2]
+
+    max_depth = max_depth_p[0]
+    cur_depth = cur_depth_p[0]
+    update = path[cur_depth]
+    update += 1
+    path[cur_depth] = update
+
+    if cur_depth < max_depth:
+        cur_depth += 1
+        cur_depth_p[0] = cur_depth
+        for i in range(5):
+            if  2 < i:
+                dfs(inputs)
+                cur_depth_p[0] = cur_depth  
+
+
+

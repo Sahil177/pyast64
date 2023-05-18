@@ -1,0 +1,139 @@
+def f(inputs):
+    test(inputs)
+
+def test(inputs):
+    num_points_p = inputs[0]
+    test_inps = inputs[1]
+    test_labels = inputs[2]
+    input_dim_p = inputs[3]
+    hidden_dim_p = inputs[4]
+    output_dim_p = inputs[5]
+    W1 = inputs[6]
+    b1 = inputs[7]
+    W2 = inputs[8]
+    b2 = inputs[9]
+    W3 = inputs[10]
+    b3 = inputs[11]
+    out1 = inputs[12]
+
+    num_points = num_points_p[0]
+    input_dim = input_dim_p[0]
+    hidden_dim = hidden_dim_p[0]
+
+    mlp_inp = array(15)
+    mlp_inp[0] = input_dim_p
+    mlp_inp[1] = hidden_dim_p
+    mlp_inp[2] = output_dim_p
+    mlp_inp[4] = W1
+    mlp_inp[5] = b1
+    mlp_inp[6] = W2
+    mlp_inp[7] = b2
+    mlp_inp[8] = W3
+    mlp_inp[9] = b3
+
+    out_p1 = array(hidden_dim)
+    out_p2 = array(hidden_dim)
+    out_p3 = array(hidden_dim)
+    out_p4 = array(hidden_dim)
+    out_p5 = array(hidden_dim)
+    mlp_inp[10] = out_p1
+    mlp_inp[11] = out_p2
+    mlp_inp[12] = out_p3
+    mlp_inp[13] = out_p4
+    mlp_inp[14] = out_p5
+
+    for i in range(num_points):
+        x = array(input_dim)
+        for j in range(input_dim):
+            x[j] = test_inps[i*input_dim+ j]
+        mlp_inp[3] = x
+        mlp(mlp_inp)
+        pred_out_p = mlp_inp[14]
+        pred_out = pred_out_p[0]
+        label = test_labels[i]
+        if pred_out < 0:
+            if label == 0:
+                out1 += 1
+        else:
+            if label == 1:
+                out1 +=1
+
+def mlp(inputs):
+    input_dim_p = inputs[0]
+    hidden_dim_p = inputs[1]
+    output_dim_p = inputs[2]
+    x = inputs[3]
+    W1 = inputs[4]
+    b1 = inputs[5]
+    W2 = inputs[6]
+    b2 = inputs[7]
+    W3 = inputs[8]
+    b3 = inputs[9]
+    out1 = inputs[10]
+    out2 = inputs[11]
+    out3 = inputs[12]
+    out4 = inputs[13]
+    out5 = inputs[14]
+
+    inputs[2] = x
+    inputs[3] = W1
+    inputs[4] = b1
+    inputs[5] = out1
+
+    fc(inputs)
+
+    inputs[0] = hidden_dim_p
+    inputs[1] = out1
+    inputs[2] = out2
+
+    ReLU(inputs)
+
+    inputs[1] = hidden_dim_p
+    inputs[2] = out2
+    inputs[3] = W2
+    inputs[4] = b2
+    inputs[5] = out3
+
+    fc(inputs)
+
+    inputs[0] = hidden_dim_p
+    inputs[1] = out3
+    inputs[2] = out4
+
+    ReLU(inputs)
+
+    inputs[1] = output_dim_p
+    inputs[2] = out4
+    inputs[3] = W3
+    inputs[4] = b3
+    inputs[5] = out5
+
+    fc(inputs)
+
+def fc(inputs):
+    input_dim_p = inputs[0]
+    input_dim = input_dim_p[0]
+    output_dim_p = inputs[1]
+    output_dim = output_dim_p[0]
+    x = inputs[2]
+    W = inputs[3]
+    b = inputs[4]
+    out = inputs[5]
+    for i in range(output_dim):
+        sum = 0
+        for j in range(input_dim):
+            sum += x[j]*W[i*input_dim+j]
+        sum += b[i]
+        out[i] = sum
+
+def ReLU(inputs):
+    N_p = inputs[0]
+    N = N_p[0]
+    x = inputs[1]
+    out = inputs[2]
+    for i in range(N):
+        val = x[i]
+        if val < 0:
+            out[i] = 0
+        else:
+            out[i] = val

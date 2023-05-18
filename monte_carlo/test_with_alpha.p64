@@ -1,0 +1,137 @@
+def f(inputs):
+    test(inputs)
+
+def test(inputs):
+    test_labels = inputs[0]
+    out = inputs[1]
+    num_points_p = inputs[3]
+    num_points = num_points_p[0]
+    skill_comb_inp = array(29)
+    for i in range(29):
+        val = inputs[i+2]
+        skill_comb_inp[i] = val
+
+    skill_comb(skill_comb_inp)
+
+    timesteps_p = inputs[19]
+    timesteps = timesteps_p[0]
+
+    outs = skill_comb_inp[11+timesteps]
+    hidden_dim_p = inputs[5]
+    hidden_dim = hidden_dim_p[0]
+
+    correct = 0
+    for i in range(num_points):
+        pred_out = outs[i*hidden_dim]
+        label = test_labels[i]
+        if pred_out < 0:
+            if label == 0:
+                correct += 1
+        else:
+            if 0 < pred_out:
+                if label == 1:
+                    correct +=1
+    
+    out[0] = correct
+
+
+def skill_comb(inputs):
+    num_inputs_p = inputs[0]
+    batch_dim_p = inputs[1]
+    input_dim_p = inputs[2]
+    hidden_dim_p = inputs[3]
+    output_dim_p = inputs[4]
+    x = inputs[5]
+    W1 = inputs[6]
+    b1 = inputs[7]
+    W2 = inputs[8]
+    b2 = inputs[9]
+    W3 = inputs[10]
+    b3 = inputs[11]
+    out1 = inputs[12]
+    out2 = inputs[13]
+    out3 = inputs[14]
+    out4 = inputs[15]
+    out5 = inputs[16]
+    timesteps_p = inputs[17]
+    skills_p = inputs[18]
+
+    num_inputs = num_inputs_p[0]
+
+    inputs_copy = array(num_inputs)
+
+    for i in range(num_inputs):
+        val = inputs[i+1]
+        inputs_copy[i] = val
+
+    timesteps = timesteps_p[0]
+    skills = skills_p[0]
+    for t in range(timesteps):
+        Ws = inputs[num_inputs + 3 + t]
+        alpha = inputs[num_inputs + 3 + 5 + t]
+
+        W_func(inputs, num_inputs, Ws)
+
+        for s in range(skills):
+            flag = alpha[s]
+            if flag == 1:
+                if s == 0:
+                    fc(inputs)
+                else:
+                    ReLU(inputs)
+
+        for i in range(num_inputs):
+            val = inputs_copy[i]
+            inputs[i+1] = val
+        
+
+def W_func(inputs, num_inputs, Wsx):
+    outputs = array(num_inputs)
+
+
+    for i in range(num_inputs):
+        sum = 0
+        for j in range(num_inputs):
+            sum += inputs[j+1]*Wsx[i*num_inputs + j]
+        outputs[i] = sum
+
+    for i in range(num_inputs):
+        inputs[i+1] = outputs[i] 
+
+
+def fc(inputs):
+    batch_dim_p = inputs[1]
+    batch_dim = batch_dim_p[0]
+    input_dim_p = inputs[2]
+    input_dim = input_dim_p[0]
+    output_dim_p = inputs[3]
+    output_dim = output_dim_p[0]
+    x = inputs[4]
+    W = inputs[5]
+    b = inputs[6]
+    out = inputs[7]
+
+    for k in range(batch_dim):
+        for i in range(output_dim):
+            sum = 0
+            for j in range(input_dim):
+                sum += x[k*input_dim +j]*W[i*input_dim+j]
+            sum += b[i]
+            out[k*output_dim + i] = sum
+
+def ReLU(inputs):
+    batch_dim_p = inputs[1]
+    N_p = inputs[2]
+    N = N_p[0]*batch_dim_p[0]
+    x = inputs[3]
+    out = inputs[4]
+    for i in range(N):
+        val = x[i]
+        if val < 0:
+            out[i] = 0
+        else:
+            out[i] = val
+
+    
+
+

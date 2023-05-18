@@ -55,14 +55,15 @@ def test(iters, max_N, max_M, inp_start, program, stack_len):
 
         x = 100 * np.random.random(size=(N))
         W = 100 * np.random.random(size=(M, N))
+        b = 100 * np.random.random(size=(M))
 
         # print(W)
         # print(x)
-        res = np.matmul(W, x)
+        res = np.matmul(W, x) + b
         # print(res)
         # inp, os, oe = fc_process(W, x, inp_start)
         W_flat = list(W.flatten())
-        inputs = [[N], [M], list(x), W_flat, [0] * M]
+        inputs = [[N], [M], list(x), W_flat, list(b), [0] * M]
         # input, os, oe = fc_process(W, x, inp_start)
         inp, os, oe = process(inputs, inp_start)
         state = execute(program, stack_len, inp)
@@ -94,8 +95,9 @@ program = convert_for_state(program)
 print(*program, sep="\n")
 x = [6, 3, 5]
 W = [[12, 13, 5], [4, 5, 5], [2, 2, 2], [5, 6, 3]]
+b = [2, 5, 6, 7]
 W_flat = [item for sublist in W for item in sublist]
-inputs = [[len(x)], [len(W)], x, W_flat, [0] * len(W)]
+inputs = [[len(x)], [len(W)], x, W_flat, b, [0] * len(W)]
 # input, os, oe = fc_process(W, x, inp_start)
 input, os, oe = process(inputs, inp_start)
 print(input)
@@ -105,6 +107,6 @@ out = state[os:oe]
 print("x", x)
 print("w", W)
 print(out)
-print(np.matmul(W, x))
+print(np.matmul(W, x) + b)
 acc = test(100, 10, 10, inp_start, program, stack_len)
 print(acc)

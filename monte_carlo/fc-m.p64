@@ -1,0 +1,23 @@
+def f(inputs):
+    fc(inputs)
+
+def fc(inputs):
+    input_dim_p = inputs[0]
+    input_dim = input_dim_p[0]
+    output_dim_p = inputs[1]
+    output_dim = output_dim_p[0]
+    x = inputs[2]
+    W = inputs[3]
+    b = inputs[4]
+    out = inputs[5]
+
+    for i in range(output_dim):
+        sum = 0
+        for j in range(input_dim):
+            sum += x[j]*W[i*input_dim+j]
+        sum += b[i]
+        out[i] = sum
+
+
+
+    

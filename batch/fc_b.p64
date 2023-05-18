@@ -1,0 +1,26 @@
+def f(inputs):
+    fc(inputs)
+
+def fc(inputs):
+    batch_dim_p = inputs[0]
+    batch_dim = batch_dim_p[0]
+    input_dim_p = inputs[1]
+    input_dim = input_dim_p[0]
+    output_dim_p = inputs[2]
+    output_dim = output_dim_p[0]
+    xs = inputs[3]
+    W = inputs[4]
+    b = inputs[5]
+    out = inputs[6]
+
+    for k in range(batch_dim):
+        for i in range(output_dim):
+            sum = 0
+            for j in range(input_dim):
+                sum += xs[k*input_dim+j]*W[i*input_dim+j]
+            sum += b[i]
+            out[k*output_dim + i] = sum
+
+
+
+    
